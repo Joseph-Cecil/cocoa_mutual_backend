@@ -2,7 +2,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 export interface IUser extends Document {
-  name: string;
+  firstName: string;
+  lastName: string;
   staffId: string;
   phone: string;
   password: string;
@@ -17,9 +18,9 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     staffId: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'staff'], default: 'staff' },
     isOptedOut: { type: Boolean, default: false },
