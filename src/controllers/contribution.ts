@@ -5,13 +5,14 @@ import AnnualContribution from "../models/contribution";
 
 export const uploadAnnualContributions = async (req: Request, res: Response) => {
   try {
-    const contributionsArray = req.body; // Should be an array of rows from Excel
+    const workbookData: Record<string, unknown[]> = req.body; // Expecting an object with sheet names
+    const staffDataArray = req.body; 
 
-    if (!Array.isArray(contributionsArray) || contributionsArray.length === 0) {
-      return res.status(400).json({ message: "No data received or invalid format." });
+    if (!workbookData || typeof workbookData !== "object") {
+      return res.status(400).json({ message: "Invalid or empty data." });
     }
 
-    const operations = contributionsArray.map(async (data: any) => {
+    const operations = staffDataArray.map(async (data: any) => {
       const staffId = data["ID"]?.toString().trim();
       const name = data["Name"]?.trim();
 
