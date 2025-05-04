@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
+import adminRoutes from "./routes/adminRoutes";
+import userRouter from "./routes/userRoutes";
 
 dotenv.config()
 
@@ -18,6 +20,8 @@ app.get("/test", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/user", userRouter);
 
 
 const PORT = process.env.PORT || 6000;

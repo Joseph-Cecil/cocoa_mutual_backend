@@ -1,12 +1,12 @@
 import express from "express";
 import { registerUser, loginUser, changePassword, resetPassword } from "../controllers/authController";
-import { authenticateUser } from "../middleware/authMiddleware";
+import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
-router.post("/register", authenticateUser, registerUser); // Only admins can register users
+router.post("/register", authenticateUser,authorizeAdmin, registerUser); // Only admins can register users
 router.post("/login", loginUser);
 router.put("/change-password", authenticateUser, changePassword);
-router.put("/reset-password", authenticateUser, resetPassword); // Reset Password (Admin Only)
+router.put("/reset-password", authenticateUser, authorizeAdmin, resetPassword); // Reset Password (Admin Only)
 
 export default router;
