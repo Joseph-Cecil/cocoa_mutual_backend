@@ -13,6 +13,7 @@ export interface IUser extends Document {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  staffData:mongoose.Types.ObjectId;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -26,6 +27,7 @@ const UserSchema = new Schema<IUser>(
     isOptedOut: { type: Boolean, default: false },
     isDeceased: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
+    staffData: { type: mongoose.Schema.Types.ObjectId, ref: 'StaffData' }
   },
   { timestamps: true }
 );
