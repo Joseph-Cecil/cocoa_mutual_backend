@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { StaffData } from "../models/staffData";
-
+import AnnualContribution from "../models/contribution";
 export const registerUser = async (req: Request, res: Response) => {
   const { firstName, lastName, staffId, password, role } = req.body;
 
@@ -13,7 +12,7 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 
   // Ensure staffId is a number and remove extra spaces
-  const cleanStaffId = Number(String(staffId).trim());
+  const cleanStaffId = String(staffId).trim();
 
   // Validate role
   const allowedRoles = ["admin", "staff"];
@@ -28,29 +27,28 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(409).json({ message: "Staff ID is already registered." });
     }
 
-    // Check if staffId exists in uploaded staff data
-    const staffData = await StaffData.findOne({ staffId: cleanStaffId });
+    // Check if staffId exists in AnnualContribution data
+    const annualContribution = await AnnualContribution.findOne({ staffId: cleanStaffId });
 
-    if (!staffData) {
-      console.log(`No staff data found for Staff ID: ${cleanStaffId}`);
+    if (!annualContribution) {
+      console.log(`No Annual Contribution data found for Staff ID: ${cleanStaffId}`);
     } else {
-      console.log(`Found staff data: ${staffData._id}`);
+      console.log(`Found Annual Contribution data: ${annualContribution._id}`);
     }
 
-
-    // Create the user
+    // Create the user and link to AnnualContribution if found
     const user = new User({
       firstName,
       lastName,
       staffId: cleanStaffId,
       password,
       role,
-      staffData: staffData ? staffData._id : null, // Link staff data if found
+      annualContribution: annualContribution ? annualContribution._id : null,
     });
 
     await user.save();
 
-    console.log(`User registered: ${user}`);
+
 
     return res.status(201).json({ message: "Staff registered successfully.", user });
   } catch (error) {

@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import User from "../models/user";
 import { sanitizeUserData } from "../utils/sanitizeUserData";
+import AnnualContribution from "../models/contribution";
 
 
 //GEt user profile
@@ -29,4 +30,23 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
       res.status(500).json({ message: "Internal server error. Please try again later." });
     }
   };
+
+  export const getUserContributionData = async(req: Request, res:Response) => {
+    try {
+      if(!req.user || !req.user.id) {
+        return res.status(401).json({message: "Unauthorized Access"})
+      }
+
+      const staffData = await AnnualContribution.findOne({staffId: req.user.staffId})
+
+      if(!staffData){
+        return res.status(404).json({message: "Staff Data Not Found"})
+      }
+
+      return res.status(200).json(staffData);
+    } catch (error) {
+      console.error("Error Fetching User Data ", error);
+      return res.status(500).json({message: " Internal Server Error, Please Try Again Later"});
+    }
+  }
   

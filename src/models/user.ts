@@ -13,7 +13,7 @@ export interface IUser extends Document {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  staffData:mongoose.Types.ObjectId;
+  annualContribution: mongoose.Types.ObjectId; // <-- Renamed for clarity
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -27,7 +27,7 @@ const UserSchema = new Schema<IUser>(
     isOptedOut: { type: Boolean, default: false },
     isDeceased: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
-    staffData: { type: mongoose.Schema.Types.ObjectId, ref: 'StaffData' }
+    annualContribution: { type: mongoose.Schema.Types.ObjectId, ref: 'AnnualContribution' }
   },
   { timestamps: true }
 );
