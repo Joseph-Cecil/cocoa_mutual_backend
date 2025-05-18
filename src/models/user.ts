@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 export interface IUser extends Document {
   firstName: string;
   lastName: string;
-  staffId: string;
+  staffId: number;
   phone: string;
   password: string;
   role: 'admin' | 'staff';
@@ -21,7 +21,7 @@ const UserSchema = new Schema<IUser>(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    staffId: { type: String, required: true, unique: true },
+    staffId: { type: Number, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'staff'], default: 'staff' },
     isOptedOut: { type: Boolean, default: false },

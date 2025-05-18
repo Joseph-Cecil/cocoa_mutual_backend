@@ -18,7 +18,7 @@ interface IMonthlyContributions {
 }
 
 export interface IAnnualContribution extends Document {
-  staffId: string;
+  staffId: number;
   name: string;
   openingBalance: number; 
   monthly: IMonthlyContributions;
@@ -33,7 +33,7 @@ export interface IAnnualContribution extends Document {
 
 const AnnualContributionSchema = new Schema<IAnnualContribution>(
   {
-    staffId: { type: String, required: true, index: true },
+    staffId: { type: Number, required: true, index: true },
     name: { type: String, required: true },
 
     monthly: {
