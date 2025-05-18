@@ -5,12 +5,17 @@ import AnnualContribution from "../models/contribution";
 
 export const uploadAnnualContributions = async (req: Request, res: Response) => {
   try {
-    const workbookData: Record<string, unknown[]> = req.body; // Expecting an object with sheet names
+    const workbookData: Record<string, unknown[]> = req.body; 
     const staffDataArray = req.body; 
 
     if (!workbookData || typeof workbookData !== "object") {
       return res.status(400).json({ message: "Invalid or empty data." });
     }
+
+    const months = [
+      " Jan ", " Feb ", " Mar ", " Apr ", " May ", " Jun ",
+      " Jul ", " Aug ", " Sep ", " Oct ", " Nov ", " Dec "
+    ];
 
     const operations = staffDataArray.map(async (data: any) => {
       const staffId = data["ID"]?.toString().trim();
@@ -18,19 +23,47 @@ export const uploadAnnualContributions = async (req: Request, res: Response) => 
 
       if (!staffId || !name) return null;
 
-      const months = [
-        "24-Jan", "24-Feb", "24-Mar", "24-Apr", "24-May", "24-Jun",
-        "24-Jul", "24-Aug", "24-Sep", "24-Oct", "24-Nov", "24-Dec"
-      ];
+// Initialize monthly data
+const monthly: Record<string, number> = {};
 
-      const monthly: Record<string, number> = {};
-      months.forEach((month) => {
-        monthly[month] = Number(data[month]) || 0;
-      });
+// Clean up Excel headers and remove spaces
+const excelHeaders = Object.keys(data).map((header) =>
+  header.replace(/[\u200B-\u200D\uFEFF]/g, "").trim()
+);
 
-      const openingBalance = Number(data["Balance as at 1/04/24"]) || 0;
+// Mapping headers dynamically
+const monthsMap: Record<string, string> = {
+  Jan: excelHeaders.find((header) => header.toLowerCase().includes("jan")) || "Jan",
+  Feb: excelHeaders.find((header) => header.toLowerCase().includes("feb")) || "Feb",
+  Mar: excelHeaders.find((header) => header.toLowerCase().includes("mar")) || "Mar",
+  Apr: excelHeaders.find((header) => header.toLowerCase().includes("apr")) || "Apr",
+  May: excelHeaders.find((header) => header.toLowerCase().includes("may")) || "May",
+  Jun: excelHeaders.find((header) => header.toLowerCase().includes("jun")) || "Jun",
+  Jul: excelHeaders.find((header) => header.toLowerCase().includes("jul")) || "Jul",
+  Aug: excelHeaders.find((header) => header.toLowerCase().includes("aug")) || "Aug",
+  Sep: excelHeaders.find((header) => header.toLowerCase().includes("sep")) || "Sep",
+  Oct: excelHeaders.find((header) => header.toLowerCase().includes("oct")) || "Oct",
+  Nov: excelHeaders.find((header) => header.toLowerCase().includes("nov")) || "Nov",
+  Dec: excelHeaders.find((header) => header.toLowerCase().includes("dec")) || "Dec",
+};
+
+// Loop through the months
+Object.keys(monthsMap).forEach((month) => {
+  const header = monthsMap[month];
+
+  // Remove commas, trim spaces, and convert to number
+  const rawValue = data[header];
+
+  if (rawValue !== undefined && rawValue !== "-" && rawValue !== "") {
+    const formattedValue = rawValue.toString().replace(/,/g, "").trim();
+    monthly[month] = Number(formattedValue) || 0;
+  } else {
+    monthly[month] = 0;
+  }
+});
+      const openingBalance = Number(data[" Balance as at 1/04/25 "]) || 0;
       const total = Object.values(monthly).reduce((acc, val) => acc + val, 0);
-      const closingBalance = Number(data[" Total  Balance as at 31/12/2024"]) || 0;
+      const closingBalance = Number(data[" Total  Balance as at 31/12/2024 "]) || 0;
       const interestPaid = Number(data[" Interest Paid "]) || 0;
       const balanceAfterInterest = Number(data[" Balance after Interest "]) || 0;
       const withdrawal = Number(data[" Withdrawal "]) || 0;
@@ -63,6 +96,7 @@ export const uploadAnnualContributions = async (req: Request, res: Response) => 
     res.status(500).json({ message: "Error processing contributions.", error });
   }
 };
+
 
 export const getAllAnnualContributions = async (req: Request, res: Response) => {
   try {
